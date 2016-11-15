@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ServerTask mTask= null;
     private TextView mTextView = null;
-    private Button mButton = null;
-    private View mProgressView;
+    private ImageButton mButton = null;
     private View mDownloadFormView;
     private String output = null;
 
@@ -40,9 +40,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTextView = (TextView) findViewById(R.id.textview2);
-        mButton = (Button) findViewById(R.id.download);
+        mButton = (ImageButton) findViewById(R.id.download);
         mDownloadFormView = findViewById(R.id.download_form);
-        mProgressView = findViewById(R.id.download_progress);
 
         if(savedInstanceState!=null) {
             output = savedInstanceState.getString("output");
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgress(true);
+                mTextView.setText("");
                 mTask = new ServerTask(MainActivity.this);
                 mTask.execute();
             }
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("output", output);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+/*    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
@@ -79,21 +78,10 @@ public class MainActivity extends AppCompatActivity {
                     mDownloadFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
         } else {
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mDownloadFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
-    }
+    }*/
 
     private class ServerTask extends AsyncTask<String, Void, String> {
 
@@ -107,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... arg0) {
             String result = null;
             try {
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
                 String link = "https://www.iiitd.ac.in/about/";
 
                 URL url = new URL(link);
@@ -123,18 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 result = sb.toString();
                 in.close();
                 return result;
-                /*
-                HttpURLConnection httpConnection = (HttpURLConnection) conn;
-                httpConnection.setRequestMethod("POST");
-                httpConnection.setDoInput(true);
-                httpConnection.setDoOutput(true);
-                httpConnection.connect();
-
-                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-
-                }
-                Log.d("ServerActivity","Http response not ok");
-                return "";*/
             } catch(Exception e) {
                 Log.d("ServerActivity","Exception");
                 e.printStackTrace();
@@ -144,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result){
-            showProgress(false);
             if(result==null) {
                 Toast.makeText(this.context, "Text empty", Toast.LENGTH_LONG).show();
             }
@@ -153,17 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 Document html = Jsoup.parse(result);
                 output = html.title();
                 mTextView.setText(output);
-                /*String output1 = null;
-                String output2 = null;
-                if(result.contains("<title>") && result.contains("</title>")) {
-                    output1 = result.substring(result.indexOf("<title>")+7);
-                    output2 = output1.substring(0, output1.indexOf("</title>"));
-                    mTextView.setText(output2);
-                }*/
-                Toast.makeText(this.context, "Download completed!", Toast.LENGTH_LONG).show();
-
-
-
+                //Toast.makeText(this.context, "Download completed!", Toast.LENGTH_LONG).show();
             }
         }
     }
